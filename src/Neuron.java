@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Neuron {
+public class Neuron implements Serializable{
 
 	private boolean DEBUG = true;
 	

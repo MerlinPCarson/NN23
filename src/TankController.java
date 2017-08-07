@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 
 public class TankController {
 
+	private final boolean MANUAL = true;
 	private int trainingTimes = 920000;	// number of times we back propagate
 	private final long trainingStart = System.currentTimeMillis();
 	private String trainedTime;
@@ -24,7 +25,7 @@ public class TankController {
 	private final int numOfMines   =  50;
 	private final int resetMines   = 5;
 	private final int numOfTanks   = 1;
-	private final int refreshRate   = 10;
+	private final int refreshRate   = 30;
 	
 	// tanks and mines on the screen
 	private ArrayList<Tank> tanks = new ArrayList<>();
@@ -109,9 +110,14 @@ public class TankController {
 			// update the neural net
 			for(Tank tank: tanks){
 
-				if(!tank.update(mines, training)){
-					System.err.println("Wrong number of NN inputs!");
-					return false;
+				if(!MANUAL) {
+					if(!tank.update(mines, training)){
+						System.err.println("Wrong number of NN inputs!");
+						return false;
+					}
+				}
+				else {
+					tank.update_position();
 				}
 
 				// check for tank collision

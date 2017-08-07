@@ -1,11 +1,13 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-public class Display extends JFrame{
+public class Display extends JFrame implements KeyListener{
 	
 	private final int mineScale;
 	private final int tankScale; 
@@ -14,6 +16,9 @@ public class Display extends JFrame{
 	
 	private ArrayList<Point2D.Double> tankVerts;
 	private ArrayList<Point2D.Double> mineVerts;
+	
+	// manual control w/buttons
+	boolean goLeft, goRight, speedUp, slowDown;
 	
 	JFrame backround;
 	Graphics g; 
@@ -30,13 +35,54 @@ public class Display extends JFrame{
 //		this.windowWidth = windowWidth;
 //		this.windowHeight = windowHeight;
 
-	
+			
+		addKeyListener(this);
+		setFocusable(true);
+		setFocusTraversalKeysEnabled(false);
+		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(windowWidth, windowHeight);
 		setVisible(true);
 		g = getGraphics();
 		
 	}
+	
+	
+	 public void keyTyped(KeyEvent e) {
+		 	char key = e.getKeyChar();
+		 	System.out.println(key + " KEY TYPED: ");
+	    }
+	
+	    /** Handle the key-pressed event from the text field. */
+	    public void keyPressed(KeyEvent e) {
+		 	char key = e.getKeyChar();
+	        if(e.getKeyCode()== KeyEvent.VK_RIGHT){
+	        	goRight = true;
+	        	goLeft = false;
+	        }
+	        else if(e.getKeyCode()== KeyEvent.VK_LEFT){
+	        	goLeft = true;
+	        	goRight = false;
+	        }
+	        else if(e.getKeyCode()== KeyEvent.VK_UP){
+	        	speedUp = true;
+	        	slowDown = false;
+	        }
+	        else if(e.getKeyCode()== KeyEvent.VK_DOWN){
+	        	speedUp = false;
+	        	slowDown = true;
+	        }
+	        
+	    }
+
+	    /** Handle the key-released event from the text field. */
+	    public void keyReleased(KeyEvent e) {
+		 	goLeft = false;
+		 	goRight = false;
+		 	speedUp = false;
+		 	slowDown = false;
+	    }
+
 	
 	private void transform_world(ArrayList<Point2D.Double> buffer, Point2D.Double minePosition){
 		
@@ -88,6 +134,10 @@ public class Display extends JFrame{
 		
 		index = 0;
 		for(Tank tank: tanks){
+			
+			if(goLeft || goRight || speedUp || slowDown){
+				tank.move(goLeft, goRight, speedUp, slowDown, mines);
+			}
 			
 			// best performing tank is red!
 			if (topScorer == index){

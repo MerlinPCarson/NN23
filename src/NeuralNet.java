@@ -1,8 +1,9 @@
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-public class NeuralNet {
+public class NeuralNet implements Serializable{
 
 	private boolean DEBUG = true;
 	

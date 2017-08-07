@@ -12,6 +12,7 @@ public class Tank {
 	private final double maxSpeed = 2;
 	private final int numOfOutputs;
 	private final double MAXSCREENDISTANCE;
+	private final double acceleration = .1;
 
 //	int trainingFreq = 2;		// frequency of back propagation to outputs
 	
@@ -86,6 +87,10 @@ public class Tank {
 		
 		// vector to closest mine
 		Point2D.Double vClosestMine = closest_mine(mines);
+		
+		load_inputs(inputs, vClosestMine);
+
+		/*		
 		// distance before move
 		double distanceX = vClosestMine.x - position.x;
 		double distanceY = vClosestMine.y - position.y;
@@ -110,6 +115,8 @@ public class Tank {
 		vectorLength = Math.sqrt(vPosition.x*vPosition.x + vPosition.y*vPosition.y);
 		vPosition.x /= vectorLength;
 		vPosition.y /= vectorLength;
+ 		*/
+		
 /*		
 		// position of tank w/r direction
 		if(direction.x > 0 && direction.y > 0){
@@ -130,11 +137,13 @@ public class Tank {
 		}
 	
 */
+		/*
 		inputs.add(vPosition.x);
 		inputs.add(vPosition.y);
 //		inputs.add(direction.x);
 //		inputs.add(direction.y);
 		inputs.add(rotation);
+		 */
 
 		// send inputs to neural net and get it's outputs
 		outputs = brain.update(inputs);
@@ -165,6 +174,9 @@ public class Tank {
 			rotation = PI - diff;
 		}
 		
+		
+		update_position();
+		
 		// keep in range [0,2PI]
 /*
 		if (rotation < 0) {
@@ -174,6 +186,7 @@ public class Tank {
 			rotation %= TWOPI;
 		}
 */		
+		/*
 		// update direction vector of tank
 //		direction.x = -Math.sin(rotation);
 //		direction.y = Math.cos(rotation);
@@ -212,10 +225,11 @@ public class Tank {
 		}
 		// normalize
 		errorRate /= MAXSCREENDISTANCE;
-		
+		*/
 		if(training){
 		
 //			if(trainingFreq == 0){
+				int errorRate = 0;
 				brain.back_propagate(inputs, outputs, errorRate);
 //				trainingFreq = 2;
 //			}
@@ -224,6 +238,73 @@ public class Tank {
 		}
 		
 		return true;
+	}
+	
+	private void load_inputs(ArrayList<Double> inputs, Point2D.Double closestMine) {
+		
+		
+		// normalize vector to closest mine 	???optimize???
+		double vectorLength = Math.sqrt(closestMine.x*closestMine.x + closestMine.y*closestMine.y);
+//		vClosestMine.x /= vectorLength;
+//		vClosestMine.y /= vectorLength;
+		
+		// create inputs for neural net
+		// vector to closest mine
+//		System.out.println("Mine objective: " + mineObjective);
+		inputs.add(closestMine.x/vectorLength);
+		inputs.add(closestMine.y/vectorLength);
+		// direction tank is looking
+//		inputs.add(direction.x);
+//		inputs.add(direction.y);	
+		
+		Point2D.Double vPosition = new Point2D.Double(position.x, position.y);
+		
+		vectorLength = Math.sqrt(vPosition.x*vPosition.x + vPosition.y*vPosition.y);
+/*		
+		// position of tank w/r direction
+		if(direction.x > 0 && direction.y > 0){
+//			vPosition.x;// /= vectorLength;
+//			vPosition.y;// /= vectorLength;
+		}
+		else if(direction.x > 0 && direction.y < 0){
+//			vPosition.x;// /=  vectorLength;
+			vPosition.y *= -1;// /= -vectorLength;
+		}
+		else if(direction.x < 0 && direction.y > 0){
+			vPosition.x *= -1;// /= -vectorLength;
+//			vPosition.y;// /=  vectorLength;
+		}
+		else{
+			vPosition.x *= -1;// /= -vectorLength;
+			vPosition.y *= -1;// /= -vectorLength;
+		}
+*/	
+	
+		inputs.add(vPosition.x/vectorLength);
+		inputs.add(vPosition.y/vectorLength);
+		
+		inputs.add(rotation);
+		
+	}
+
+	public void update_position(){
+		
+		// update direction vector of tank
+		direction.x = Math.cos(rotation);
+		direction.y = Math.sin(rotation);
+//		direction.x = -Math.sin(rotation);
+//		direction.y = Math.cos(rotation);
+//		System.out.println("looking X: " + direction.x + " looking Y: " + direction.y);
+		
+		// update tanks position
+		position.x += (direction.x * speed);
+		position.y += (direction.y * speed);
+		
+		// wrap around the window, vertically and horizontally
+		if(position.x > windowWidth)   position.x = 0;
+		if(position.x < 0)  			position.x = windowWidth;
+		if(position.y > windowHeight)  position.y = 0;
+		if(position.y < 0) 			position.y = windowHeight;
 	}
 	
 	public void transform_world(ArrayList<Point2D.Double> sweeper){
@@ -341,5 +422,55 @@ public class Tank {
 		return brain.total_weights();
 	}
 
+public void move(boolean goLeft, boolean goRight, boolean speedUp, boolean slowDown, ArrayList<Point2D.Double> mines) {
+		
+		int ground_truth = 0;
+		if(goLeft){
+			rotation -= maxTurnRate;
+			ground_truth = 1;
+		}
+		else if(goRight){
+			rotation += maxTurnRate;
+			ground_truth = -1;
+		}
+		else if(speedUp){
+			if(speed < maxSpeed){
+				speed += acceleration;
+			}
+			ground_truth = 0;
+		}
+		else if(slowDown){
+			if(speed > 0){
+				speed -= acceleration;
+			}
+			ground_truth = 0;
+		}
+		
+		
+		
+
+		ArrayList<Double> inputs = new ArrayList<>();
+		ArrayList<Double> outputs = new ArrayList<>();
+
+// get vector to closest mine
+//		Point2D.Double vClosestMine = mines.get(closest_mine(mines));
+		Point2D.Double vClosestMine = closest_mine(mines);
+		
+		load_inputs(inputs, vClosestMine);
+		
+		// send inputs to neural net and get it's outputs
+		outputs = brain.update(inputs);
+		
+		update_position();
+		
+//		if(trainingTimes > 0){
+			
+				brain.back_propagate(inputs, outputs, ground_truth);
+//				--trainingTimes;
+//		}
+
+		
+		
+	}
 	
 }
