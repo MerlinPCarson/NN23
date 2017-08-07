@@ -1,4 +1,5 @@
 
+// Main class for Neural Network with tank training game
 public class Main {
 
 	public static void main(String[] args){
