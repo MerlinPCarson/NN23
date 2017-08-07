@@ -1,6 +1,12 @@
 import java.util.ArrayList;
 import java.util.Random;
 import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 
 public class TankController {
@@ -22,8 +28,8 @@ public class TankController {
 	private final int tankSize     = 5 + 2 * tankScale;
 	private final int mineScale    = 2;
 	private final int mineSize     = 5 + 2 * mineScale;
-	private final int numOfMines   =  50;
-	private final int resetMines   = 5;
+	private final int numOfMines   =  2;
+	private final int resetMines   = 0;
 	private final int numOfTanks   = 1;
 	private final int refreshRate   = 30;
 	
@@ -41,13 +47,9 @@ public class TankController {
 	
 	TankController(){
 		
-		Tank newTank;
-		
-		// create the tanks!
-		for(int cnt = 0; cnt < numOfTanks; ++cnt){
-			newTank = new Tank(numOfInputsPerNeuron, numOfOutputsInNN, windowWidth, windowHeight, tankScale);
-			tanks.add(newTank);
-		}
+		// initialize tanks
+		add_tanks();
+
 		
 		// initialize mine locations
 		init_mines();
@@ -60,6 +62,35 @@ public class TankController {
 		
 		// create display window
 		display = new Display(windowWidth, windowHeight, mineScale, tankScale);
+	}
+
+	private void add_tanks() {
+		Tank newTank;	
+		
+		// create the tanks!
+		for(int cnt = 0; cnt < numOfTanks; ++cnt){
+			if(new File("savNN\\NN" + cnt + ".ser").isFile()) {
+				try {
+			         FileInputStream fileIn = new FileInputStream("savNN\\NN" + cnt + ".ser");
+			         ObjectInputStream in = new ObjectInputStream(fileIn);
+			         newTank = (Tank) in.readObject();
+			         in.close();
+			         fileIn.close();
+			      }catch(IOException i) {
+			         i.printStackTrace();
+			         return;
+			      }catch(ClassNotFoundException c) {
+			         System.out.println("Tank class not found");
+			         c.printStackTrace();
+			         return;
+			      }
+			}
+			else {
+				newTank = new Tank(numOfInputsPerNeuron, numOfOutputsInNN, windowWidth, windowHeight, tankScale);
+			}
+			tanks.add(newTank);
+		}
+		
 	}
 
 	private void init_mines(){
@@ -102,6 +133,9 @@ public class TankController {
 			else{
 				trainedTime = sdf.format(System.currentTimeMillis()-trainingStart);
 				training = false;
+				// save the neural networks for each tank using serializable
+				save_nets();
+				
 			}
 		}
 		
@@ -150,6 +184,27 @@ public class TankController {
 	
 		return true;
 			
+	}
+
+	private void save_nets() {
+		
+		int index = 0;
+		
+		for(Tank tank: tanks) {
+			try {
+				FileOutputStream fileOut =
+						new FileOutputStream("savNN\\NN" + index + ".ser");
+				ObjectOutputStream out = new ObjectOutputStream(fileOut);
+				out.writeObject(tank);
+				out.close();
+				fileOut.close();
+				System.out.printf("Serialized data is saved in savNN\\NN" + index + ".ser");
+			}catch(IOException i) {
+				i.printStackTrace();
+			}
+		
+			++index;
+		}
 	}
 	
 

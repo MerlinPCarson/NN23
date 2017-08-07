@@ -1,8 +1,9 @@
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Tank {
+public class Tank implements Serializable{
 
 	private final boolean DEBUG = false;
 	
