@@ -120,12 +120,12 @@ public class Layer implements Serializable{
 		// loss from direction
 		// normalize ground truth
 		groundTruth /= PI;
-		if(groundTruth > 0){	// rotate clockwise
+		if(groundTruth < 0){	// rotate clockwise
 			delta_error[0] = delta_error_output(outputs.get(0), minGroundTruth);
-			delta_error[1] = delta_error_output(outputs.get(1), maxGroundTruth);
+			delta_error[1] = delta_error_output(outputs.get(1), groundTruth);
 		}
 		else{					// rotate counterclockwise
-			delta_error[0] = delta_error_output(outputs.get(0), maxGroundTruth);
+			delta_error[0] = delta_error_output(outputs.get(0), groundTruth);
 			delta_error[1] = delta_error_output(outputs.get(1), minGroundTruth);
 		}
 	

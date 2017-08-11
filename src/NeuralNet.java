@@ -6,6 +6,7 @@ import java.util.ListIterator;
 public class NeuralNet implements Serializable{
 
 	private boolean DEBUG = true;
+	private boolean DEBUG2 = true;
 	
 	private final double PI = 3.14159265358979;
 	private final double TWOPI = 2 * PI;
@@ -22,7 +23,7 @@ public class NeuralNet implements Serializable{
 	private final double maxGroundTruth = 1.0;
 	
 	// consts for neurons
-	private final double learningRate = .25;
+	private final double learningRate = .75;
 	
 	ArrayList<Layer> layers = new ArrayList<>();
 	
@@ -154,9 +155,19 @@ public class NeuralNet implements Serializable{
 		
 		rotation.x = closestMineX - tankX;
 		rotation.y = closestMineY - tankY;
+		
 		angle = Math.atan2(rotation.y, rotation.x);
 		
 		desiredRotation = angle - tankAngle;
+		
+		
+		// keep in range [-PI,PI]
+		if(desiredRotation > PI) {
+			desiredRotation -= TWOPI;
+		}
+		else if(desiredRotation < -PI) {
+			desiredRotation += TWOPI;
+		}
 		
 		if(Math.abs(desiredRotation) > Math.abs(TWOPI - desiredRotation)) {
 			desiredRotation = TWOPI - desiredRotation;
@@ -164,14 +175,14 @@ public class NeuralNet implements Serializable{
 		
 		
 		
-		
 	/*	
 		
 		desiredRotation = Math.atan2(lookingY, lookingX ) - Math.atan2(closestMineY, closestMineX);
 	*/	
-		if(DEBUG){
+		if(DEBUG2){
 	//		System.out.println("Position: " + lookingX + "," + lookingY);
 		System.out.println("tank angle: " + tankAngle + " difference angle: " + angle);
+		System.out.println("diffX: " + rotation.x + " diffY: " + rotation.y );
 		System.out.println("desired rotation: " + desiredRotation);
 		}
 	

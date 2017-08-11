@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Neuron implements Serializable{
 
-	private boolean DEBUG = true;
+	private boolean DEBUG = false;
 	
 	private final int numInputs;
 	private final double learningRate;

@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 
 public class TankController {
 
-	private final boolean MANUAL = true;
+	private final boolean MANUAL = false;
 	private int trainingTimes = 920000;	// number of times we back propagate
 	private final long trainingStart = System.currentTimeMillis();
 	private String trainedTime;
@@ -28,9 +28,9 @@ public class TankController {
 	private final int tankSize     = 5 + 2 * tankScale;
 	private final int mineScale    = 2;
 	private final int mineSize     = 5 + 2 * mineScale;
-	private final int numOfMines   =  2;
-	private final int resetMines   = 0;
-	private final int numOfTanks   = 1;
+	private final int numOfMines   =  50;
+	private final int resetMines   = 5;
+	private final int numOfTanks   = 3;
 	private final int refreshRate   = 30;
 	
 	// tanks and mines on the screen

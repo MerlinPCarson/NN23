@@ -91,61 +91,6 @@ public class Tank implements Serializable{
 		
 		load_inputs(inputs, vClosestMine);
 
-		/*		
-		// distance before move
-		double distanceX = vClosestMine.x - position.x;
-		double distanceY = vClosestMine.y - position.y;
-		double distanceToMine = Math.sqrt(distanceX*distanceX + distanceY*distanceY);
-		
-		// normalize vector to closest mine 	???optimize???
-		double vectorLength = Math.sqrt(vClosestMine.x*vClosestMine.x + vClosestMine.y*vClosestMine.y);
-		vClosestMine.x /= vectorLength;
-		vClosestMine.y /= vectorLength;
-		
-		// create inputs for neural net
-		// vector to closest mine
-		inputs.add(vClosestMine.x);
-		inputs.add(vClosestMine.y);
-		// direction tank is looking
-//		inputs.add(direction.x);
-//		inputs.add(direction.y);	
-		
-		Point2D.Double vPosition = new Point2D.Double(position.x, position.y);
-
-		
-		vectorLength = Math.sqrt(vPosition.x*vPosition.x + vPosition.y*vPosition.y);
-		vPosition.x /= vectorLength;
-		vPosition.y /= vectorLength;
- 		*/
-		
-/*		
-		// position of tank w/r direction
-		if(direction.x > 0 && direction.y > 0){
-			vPosition.x /= vectorLength;
-			vPosition.y /= vectorLength;
-		}
-		else if(direction.x > 0 && direction.y < 0){
-			vPosition.x /=  vectorLength;
-			vPosition.y /= -vectorLength;
-		}
-		else if(direction.x < 0 && direction.y > 0){
-			vPosition.x /= -vectorLength;
-			vPosition.y /=  vectorLength;
-		}
-		else{
-			vPosition.x /= -vectorLength;
-			vPosition.y /= -vectorLength;
-		}
-	
-*/
-		/*
-		inputs.add(vPosition.x);
-		inputs.add(vPosition.y);
-//		inputs.add(direction.x);
-//		inputs.add(direction.y);
-		inputs.add(rotation);
-		 */
-
 		// send inputs to neural net and get it's outputs
 		outputs = brain.update(inputs);
 		// check size of outputs is correct
@@ -161,21 +106,14 @@ public class Tank implements Serializable{
 		
 		// clamp rotation magnitude
 		tankRotation =  Math.max(-maxTurnRate, Math.min(maxTurnRate, tankRotation));
-		
+			
 		// add rotation to tanks current angle
 		rotation += tankRotation;
+	
+		// rotation [-PI,PI]
+		correct_rotation();
 		
-		// keep in range [-PI,PI]
-		if(rotation > PI) {
-			double diff = rotation - PI;
-			rotation = -PI + diff;
-		}
-		else if(rotation < -PI) {
-			double diff = rotation + PI;
-			rotation = PI - diff;
-		}
-		
-		
+		// update tank's position
 		update_position();
 		
 		// keep in range [0,2PI]
@@ -187,55 +125,9 @@ public class Tank implements Serializable{
 			rotation %= TWOPI;
 		}
 */		
-		/*
-		// update direction vector of tank
-//		direction.x = -Math.sin(rotation);
-//		direction.y = Math.cos(rotation);
-		// update direction vector of tank
-		direction.x = Math.cos(rotation);
-		direction.y = Math.sin(rotation);
-//		System.out.println("looking X: " + direction.x + " looking Y: " + direction.y);
-		
-		// update tanks position
-		position.x += (direction.x * speed);
-		position.y += (direction.y * speed);
-		
-		// wrap around the window, vertically and horizontally
-		if(position.x > windowWidth)   position.x = 0;
-		if(position.x < 0)  			position.x = windowWidth;
-		if(position.y > windowHeight)  position.y = 0;
-		if(position.y < 0) 			position.y = windowHeight;
-		
-		// distance after move
-		distanceX = vClosestMine.x - position.x;
-		distanceY = vClosestMine.y - position.y;
-		double newDistanceToMine = Math.sqrt(distanceX*distanceX + distanceY*distanceY);
-		
-		double errorRate;
-		
-		if(newDistanceToMine < distanceToMine){
-			if(newDistanceToMine > 10) {
-				errorRate = -newDistanceToMine;		// getting warmer, decrease error rate
-			}
-			else {
-				errorRate = 0;
-			}
-		}
-		else{
-			errorRate = newDistanceToMine;		// getting colder, increase error rate
-		}
-		// normalize
-		errorRate /= MAXSCREENDISTANCE;
-		*/
 		if(training){
-		
-//			if(trainingFreq == 0){
-				int errorRate = 0;
-				brain.back_propagate(inputs, outputs, errorRate);
-//				trainingFreq = 2;
-//			}
-//		--trainingFreq;
-		
+			int errorRate = 0;
+			brain.back_propagate(inputs, outputs, errorRate);
 		}
 		
 		return true;
@@ -246,14 +138,12 @@ public class Tank implements Serializable{
 		
 		// normalize vector to closest mine 	???optimize???
 		double vectorLength = Math.sqrt(closestMine.x*closestMine.x + closestMine.y*closestMine.y);
-//		vClosestMine.x /= vectorLength;
-//		vClosestMine.y /= vectorLength;
 		
 		// create inputs for neural net
 		// vector to closest mine
 //		System.out.println("Mine objective: " + mineObjective);
-		inputs.add(closestMine.x/vectorLength);
-		inputs.add(closestMine.y/vectorLength);
+		inputs.add(closestMine.x);
+		inputs.add(closestMine.y);
 		// direction tank is looking
 //		inputs.add(direction.x);
 //		inputs.add(direction.y);	
@@ -261,34 +151,29 @@ public class Tank implements Serializable{
 		Point2D.Double vPosition = new Point2D.Double(position.x, position.y);
 		
 		vectorLength = Math.sqrt(vPosition.x*vPosition.x + vPosition.y*vPosition.y);
-/*		
-		// position of tank w/r direction
-		if(direction.x > 0 && direction.y > 0){
-//			vPosition.x;// /= vectorLength;
-//			vPosition.y;// /= vectorLength;
-		}
-		else if(direction.x > 0 && direction.y < 0){
-//			vPosition.x;// /=  vectorLength;
-			vPosition.y *= -1;// /= -vectorLength;
-		}
-		else if(direction.x < 0 && direction.y > 0){
-			vPosition.x *= -1;// /= -vectorLength;
-//			vPosition.y;// /=  vectorLength;
-		}
-		else{
-			vPosition.x *= -1;// /= -vectorLength;
-			vPosition.y *= -1;// /= -vectorLength;
-		}
-*/	
 	
-		inputs.add(vPosition.x/vectorLength);
-		inputs.add(vPosition.y/vectorLength);
+		inputs.add(vPosition.x);
+		inputs.add(vPosition.y);
 		
+		// radian angle of tank direction
 		inputs.add(rotation);
 		
 	}
 
+	private void correct_rotation() {
+		
+		// keep in range [-PI,PI]
+		if(rotation > PI) {
+			double diff = rotation - PI;
+			rotation = -PI + diff;
+		}
+		else if(rotation < -PI) {
+			double diff = rotation + PI;
+			rotation = PI - diff;
+		}
+	}
 	public void update_position(){
+		
 		
 		// update direction vector of tank
 		direction.x = Math.cos(rotation);
@@ -306,6 +191,7 @@ public class Tank implements Serializable{
 		if(position.x < 0)  			position.x = windowWidth;
 		if(position.y > windowHeight)  position.y = 0;
 		if(position.y < 0) 			position.y = windowHeight;
+	
 	}
 	
 	public void transform_world(ArrayList<Point2D.Double> sweeper){
@@ -428,27 +314,23 @@ public void move(boolean goLeft, boolean goRight, boolean speedUp, boolean slowD
 		int ground_truth = 0;
 		if(goLeft){
 			rotation -= maxTurnRate;
-			ground_truth = 1;
 		}
 		else if(goRight){
 			rotation += maxTurnRate;
-			ground_truth = -1;
 		}
 		else if(speedUp){
 			if(speed < maxSpeed){
 				speed += acceleration;
 			}
-			ground_truth = 0;
 		}
 		else if(slowDown){
 			if(speed > 0){
 				speed -= acceleration;
 			}
-			ground_truth = 0;
 		}
 		
-		
-		
+		// rotation [-PI,PI]
+		correct_rotation();
 
 		ArrayList<Double> inputs = new ArrayList<>();
 		ArrayList<Double> outputs = new ArrayList<>();
