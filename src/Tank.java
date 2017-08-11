@@ -164,12 +164,14 @@ public class Tank implements Serializable{
 		
 		// keep in range [-PI,PI]
 		if(rotation > PI) {
-			double diff = rotation - PI;
-			rotation = -PI + diff;
+//			double diff = rotation - PI;
+//			rotation = -PI + diff;
+			rotation -= TWOPI;
 		}
 		else if(rotation < -PI) {
-			double diff = rotation + PI;
-			rotation = PI - diff;
+//			double diff = rotation + PI;
+//			rotation = PI - diff;
+			rotation += TWOPI;
 		}
 	}
 	public void update_position(){

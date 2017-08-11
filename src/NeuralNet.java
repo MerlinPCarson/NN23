@@ -5,8 +5,8 @@ import java.util.ListIterator;
 
 public class NeuralNet implements Serializable{
 
-	private boolean DEBUG = true;
-	private boolean DEBUG2 = true;
+	private boolean DEBUG = false;
+	private boolean DEBUG2 = false;
 	
 	private final double PI = 3.14159265358979;
 	private final double TWOPI = 2 * PI;
@@ -14,8 +14,8 @@ public class NeuralNet implements Serializable{
 	private final double THREE_PI_HALVES = 3*PI_HALVES;
 	private final int numInputs;
 	private final int numOutputs;
-	private final int numNeuronsPerLayer = 3;
-	private final int numHiddenLayers = 1;
+	private final int numNeuronsPerLayer = 6;
+	private final int numHiddenLayers = 2;
 	
 	// consts for layers
 	private final int numOfNNOutputs = 2;
