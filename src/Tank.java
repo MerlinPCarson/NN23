@@ -9,7 +9,7 @@ public class Tank implements Serializable{
 	
 	private final double PI = 3.14159265358979;
 	private final double TWOPI = 2*PI;
-	private final double maxTurnRate = 0.2;
+	private final double maxTurnRate = 0.4;
 	private final double maxSpeed = 2;
 	private final int numOfOutputs;
 	private final double MAXSCREENDISTANCE;

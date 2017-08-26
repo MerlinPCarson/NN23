@@ -31,7 +31,7 @@ public class TankController {
 	private final int numOfMines   =  50;
 	private final int resetMines   = 5;
 	private final int numOfTanks   = 3;
-	private final int refreshRate   = 5;
+	private final int refreshRate   = 30;
 	
 	// tanks and mines on the screen
 	private ArrayList<Tank> tanks = new ArrayList<>();

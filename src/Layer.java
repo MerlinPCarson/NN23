@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class Layer implements Serializable{
 
-	private boolean DEBUG = true;
+	private boolean DEBUG = false;
 	
 	private final double PI = 3.14159265358979;
 	private final int numNeurons;
