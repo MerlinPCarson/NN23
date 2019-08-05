@@ -5,3 +5,4 @@ Neural Network with tank training game
 - Serializes model so training can be resumed.
 - Programmed computer graphics linear algebra library from scratch.
 
+[!Project Demo](https://youtu.be/ngKep9XJIhQ)
